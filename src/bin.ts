@@ -10,7 +10,7 @@ import chalk from 'chalk'
 
 import { main } from '.'
 
-main().catch((e) => {
+main().catch((e: unknown) => {
   console.log(chalk.bold.red('Unexpected Error'))
   console.error(e)
   process.exit(1)

@@ -1,5 +1,6 @@
 import * as assert from 'assert'
 import chalk from 'chalk'
+import { describe, it } from 'vitest'
 
 import * as _ from '../src/Logger'
 
@@ -16,7 +17,7 @@ describe.concurrent('Logger', () => {
     })
   })
 
-  describe('utils', () => {
+  describe.sequential('utils', () => {
     it('debug', async () => {
       const log_ = console.log
 

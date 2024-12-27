@@ -1,11 +1,11 @@
 /**
  * @since 0.6.0
  */
+import * as E from 'fp-ts/Either'
 import { flow, pipe } from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
 import * as fs from 'fs-extra'
-import * as glob from 'glob'
-import * as rimraf from 'rimraf'
+import { glob, GlobOptions } from 'glob'
 
 import { toErrorMsg } from './Logger'
 
@@ -30,7 +30,7 @@ export interface FileSystem {
   /**
    * Searches for files matching the specified glob pattern.
    */
-  readonly search: (pattern: string, exclude: ReadonlyArray<string>) => TE.TaskEither<string, ReadonlyArray<string>>
+  readonly search: (pattern: string, exclude: readonly string[]) => TE.TaskEither<string, string[]>
 }
 
 /**
@@ -57,38 +57,29 @@ export const File = (path: string, content: string, overwrite = false): File => 
   overwrite
 })
 
-const readFile: (path: string, encoding: string) => TE.TaskEither<Error, string> = TE.taskify<
-  string,
-  string,
-  Error,
-  string
->(fs.readFile)
+const readFile: (path: string, encoding: BufferEncoding) => TE.TaskEither<Error, string> = TE.tryCatchK(
+  (path, encoding) => fs.readFile(path, { encoding }),
+  E.toError
+)
 
 const writeFile: (
   path: string,
   data: string,
   options: {
-    readonly encoding?: string
+    readonly encoding?: BufferEncoding
     readonly flag?: string
     readonly mode?: number
   }
-) => TE.TaskEither<Error, void> = TE.taskify<string, string, fs.WriteFileOptions, Error, void>(fs.outputFile)
+) => TE.TaskEither<Error, void> = TE.tryCatchK((path, data, options) => fs.outputFile(path, data, options), E.toError)
 
-const exists: (path: string) => TE.TaskEither<Error, boolean> = TE.taskify<string, Error, boolean>(fs.pathExists)
+const exists = TE.tryCatchK((path: string) => fs.pathExists(path), E.toError)
 
-const remove: (path: string, options: rimraf.Options) => TE.TaskEither<Error, void> = TE.taskify<
-  string,
-  rimraf.Options,
-  Error,
-  void
->(rimraf)
+const remove: (path: string) => TE.TaskEither<Error, void> = TE.tryCatchK((path) => fs.remove(path), E.toError)
 
-const search: (pattern: string, options: glob.IOptions) => TE.TaskEither<Error, ReadonlyArray<string>> = TE.taskify<
-  string,
-  glob.IOptions,
-  Error,
-  ReadonlyArray<string>
->(glob)
+const search = TE.tryCatchK(
+  (pattern: string, options: GlobOptions) => glob(pattern, { ...options, withFileTypes: false }),
+  E.toError
+)
 
 /**
  * @category instances
@@ -98,6 +89,6 @@ export const FileSystem: FileSystem = {
   readFile: (path) => pipe(readFile(path, 'utf8'), TE.mapLeft(toErrorMsg)),
   writeFile: (path, content) => pipe(writeFile(path, content, { encoding: 'utf8' }), TE.mapLeft(toErrorMsg)),
   exists: flow(exists, TE.mapLeft(toErrorMsg)),
-  remove: (pattern) => pipe(remove(pattern, {}), TE.mapLeft(toErrorMsg)),
-  search: (pattern, exclude) => pipe(search(pattern, { ignore: exclude }), TE.mapLeft(toErrorMsg))
+  remove: (pattern) => pipe(remove(pattern), TE.mapLeft(toErrorMsg)),
+  search: (pattern, exclude) => pipe(search(pattern, { ignore: [...exclude] }), TE.mapLeft(toErrorMsg))
 }

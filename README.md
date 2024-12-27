@@ -1,15 +1,14 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 **Table of contents**
 
 - [Installation:](#installation)
-  - [Via `npm`](#via-npm)
-  - [Via `yarn`](#via-yarn)
-  - [Via `npx` (on-demand)](#via-npx-on-demand)
+    - [Via `npm`](#via-npm)
+    - [Via `yarn`](#via-yarn)
+    - [Via `npx` (on-demand)](#via-npx-on-demand)
 - [Why](#why)
 - [Usage](#usage)
-  - [Supported JSDoc Tags](#supported-jsdoc-tags)
+    - [Supported JSDoc Tags](#supported-jsdoc-tags)
   - [Example](#example)
 - [Configuration](#configuration)
 - [Documentation](#documentation)

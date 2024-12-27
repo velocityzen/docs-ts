@@ -65,9 +65,7 @@ const getLoggerEntry =
     T.fromIO(C.log(withColor(showEntry.show(entry))))
 
 const debugLogger = L.filter(getLoggerEntry(chalk.cyan), (e) => e.level === 'DEBUG')
-
 const errorLogger = L.filter(getLoggerEntry(chalk.bold.red), (e) => e.level === 'ERROR')
-
 const infoLogger = L.filter(getLoggerEntry(chalk.bold.magenta), (e) => e.level === 'INFO')
 
 const mainLogger = pipe([debugLogger, errorLogger, infoLogger], M.concatAll(L.getMonoid<LogEntry>()))

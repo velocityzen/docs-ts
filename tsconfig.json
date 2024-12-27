@@ -15,7 +15,7 @@
     "forceConsistentCasingInFileNames": true,
     "stripInternal": true,
     "skipLibCheck": true,
-    "types": ["vitest/globals"]
+    "typeRoots": ["node_modules/@types", "./types"]
   },
-  "include": ["./src", "./test"]
+  "include": ["./src", "./test", "./*.config.ts"]
 }

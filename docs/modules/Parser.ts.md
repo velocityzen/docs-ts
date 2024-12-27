@@ -13,7 +13,7 @@ Added in v0.6.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [model](#model)
-  - [Parser (interface)](#parser-interface)
+  - [Parser (type alias)](#parser-type-alias)
   - [ParserEnv (interface)](#parserenv-interface)
 - [parsers](#parsers)
   - [parseClasses](#parseclasses)
@@ -29,12 +29,12 @@ Added in v0.6.0
 
 # model
 
-## Parser (interface)
+## Parser (type alias)
 
 **Signature**
 
 ```ts
-export interface Parser<A> extends RE.ReaderEither<ParserEnv, string, A> {}
+export type Parser<A> = RE.ReaderEither<ParserEnv, string, A>
 ```
 
 Added in v0.6.0
@@ -90,7 +90,7 @@ Added in v0.6.0
 
 ```ts
 export declare const parseFiles: (
-  files: ReadonlyArray<File>
+  files: ReadonlyArray<File>,
 ) => RTE.ReaderTaskEither<EnvironmentWithConfig, string, ReadonlyArray<Module>>
 ```
 

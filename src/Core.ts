@@ -19,6 +19,7 @@ import { Logger } from './Logger'
 import { printModule } from './Markdown'
 import { Documentable, Module } from './Module'
 import * as Parser from './Parser'
+import { normalize } from 'path'
 
 /**
  * @category main
@@ -158,7 +159,7 @@ export interface Capabilities {
  * @category model
  * @since 0.6.0
  */
-export interface Program<A> extends RTE.ReaderTaskEither<Capabilities, string, A> {}
+export type Program<A> = RTE.ReaderTaskEither<Capabilities, string, A>
 
 /**
  * @category model
@@ -172,7 +173,7 @@ export interface EnvironmentWithConfig extends Capabilities {
  * @category model
  * @since 0.6.0
  */
-export interface ProgramWithConfig<A> extends RTE.ReaderTaskEither<EnvironmentWithConfig, string, A> {}
+export type ProgramWithConfig<A> = RTE.ReaderTaskEither<EnvironmentWithConfig, string, A>
 
 // -------------------------------------------------------------------------------------
 // filesystem APIs
@@ -227,7 +228,7 @@ const readSourcePaths: ProgramWithConfig<ReadonlyArray<string>> = pipe(
   RTE.chainTaskEitherK(({ fileSystem, logger, config }) =>
     pipe(
       fileSystem.search(path.join(config.srcDir, '**', '*.ts'), config.exclude),
-      TaskEither.map(ReadonlyArray.map(path.normalize)),
+      TaskEither.map(ReadonlyArray.map(normalize)),
       TaskEither.tap((paths) => pipe(logger.info(`${paths.length} module(s) found`)))
     )
   )
@@ -305,7 +306,17 @@ const getExampleFiles = (modules: ReadonlyArray<Module>): ProgramWithConfig<Read
   )
 
 const addAssertImport = (code: string): string =>
-  code.indexOf('assert.') !== -1 ? `import * as assert from 'assert'\n${code}` : code
+  code.includes('assert.') ? `import * as assert from 'assert'\n${code}` : code
+
+function hasPath(groups: unknown): groups is { path: string } {
+  return (
+    typeof groups === 'object' &&
+    groups !== null &&
+    'path' in groups &&
+    typeof groups.path === 'string' &&
+    groups.path !== ''
+  )
+}
 
 const replaceProjectName = (source: string): ProgramWithConfig<string> =>
   pipe(
@@ -315,8 +326,8 @@ const replaceProjectName = (source: string): ProgramWithConfig<string> =>
         new RegExp(`from (?<quote>['"])${projectName}(?:/lib)?(?:/(?<path>.*))?\\k<quote>`, 'g')
 
       return source.replace(importRegex(config.projectName), (...args) => {
-        const groups: { path?: string } = args[args.length - 1]
-        return `from '../../src${groups.path ? `/${groups.path}` : ''}'`
+        const groups: unknown = args.at(-1)
+        return `from '../../src${hasPath(groups) ? `/${groups.path}` : ''}'`
       })
     })
   )

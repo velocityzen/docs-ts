@@ -1,6 +1,7 @@
 /**
  * @since 0.6.0
  */
+import { format } from '@prettier/sync'
 import { Endomorphism } from 'fp-ts/Endomorphism'
 import { intercalate } from 'fp-ts/Foldable'
 import { absurd, flow, pipe } from 'fp-ts/function'
@@ -12,12 +13,10 @@ import * as RR from 'fp-ts/ReadonlyRecord'
 import { Semigroup } from 'fp-ts/Semigroup'
 import { Show } from 'fp-ts/Show'
 import * as S from 'fp-ts/string'
-import * as prettier from 'prettier'
 
 import { Class, Constant, Export, Function, Interface, Method, Module, Property, TypeAlias } from './Module'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const toc = require('markdown-toc')
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const toc = require('markdown-toc') as (m: string) => { content: string }
 
 // -------------------------------------------------------------------------------------
 // model
@@ -561,14 +560,14 @@ export const monoidMarkdown: M.Monoid<Markdown> = {
   empty: PlainText('')
 }
 
-const prettierOptions: prettier.Options = {
+const prettierOptions = {
   parser: 'markdown',
   semi: false,
   singleQuote: true,
   printWidth: 120
 }
 
-const prettify = (s: string): string => prettier.format(s, prettierOptions)
+const prettify = (s: string): string => format(s, prettierOptions)
 
 const canonicalizeMarkdown: Endomorphism<ReadonlyArray<Markdown>> = RA.filterMap((markdown) =>
   pipe(

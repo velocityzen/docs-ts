@@ -88,7 +88,7 @@ export interface FileSystem {
   /**
    * Searches for files matching the specified glob pattern.
    */
-  readonly search: (pattern: string, exclude: ReadonlyArray<string>) => TE.TaskEither<string, ReadonlyArray<string>>
+  readonly search: (pattern: string, exclude: readonly string[]) => TE.TaskEither<string, string[]>
 }
 ```
 

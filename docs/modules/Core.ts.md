@@ -17,8 +17,8 @@ Added in v0.6.0
 - [model](#model)
   - [Capabilities (interface)](#capabilities-interface)
   - [EnvironmentWithConfig (interface)](#environmentwithconfig-interface)
-  - [Program (interface)](#program-interface)
-  - [ProgramWithConfig (interface)](#programwithconfig-interface)
+  - [Program (type alias)](#program-type-alias)
+  - [ProgramWithConfig (type alias)](#programwithconfig-type-alias)
 
 ---
 
@@ -72,22 +72,22 @@ export interface EnvironmentWithConfig extends Capabilities {
 
 Added in v0.6.0
 
-## Program (interface)
+## Program (type alias)
 
 **Signature**
 
 ```ts
-export interface Program<A> extends RTE.ReaderTaskEither<Capabilities, string, A> {}
+export type Program<A> = RTE.ReaderTaskEither<Capabilities, string, A>
 ```
 
 Added in v0.6.0
 
-## ProgramWithConfig (interface)
+## ProgramWithConfig (type alias)
 
 **Signature**
 
 ```ts
-export interface ProgramWithConfig<A> extends RTE.ReaderTaskEither<EnvironmentWithConfig, string, A> {}
+export type ProgramWithConfig<A> = RTE.ReaderTaskEither<EnvironmentWithConfig, string, A>
 ```
 
 Added in v0.6.0

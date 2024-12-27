@@ -52,7 +52,7 @@ export declare const Class: (
   signature: string,
   methods: ReadonlyArray<Method>,
   staticMethods: ReadonlyArray<Method>,
-  properties: ReadonlyArray<Property>
+  properties: ReadonlyArray<Property>,
 ) => Class
 ```
 
@@ -79,7 +79,7 @@ export declare const Documentable: (
   since: O.Option<string>,
   deprecated: boolean,
   examples: ReadonlyArray<Example>,
-  category: O.Option<string>
+  category: O.Option<string>,
 ) => Documentable
 ```
 
@@ -138,7 +138,7 @@ export declare const Module: (
   functions: ReadonlyArray<Function>,
   typeAliases: ReadonlyArray<TypeAlias>,
   constants: ReadonlyArray<Constant>,
-  exports: ReadonlyArray<Export>
+  exports: ReadonlyArray<Export>,
 ) => Module
 ```
 

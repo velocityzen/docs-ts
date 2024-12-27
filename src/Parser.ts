@@ -38,6 +38,10 @@ import {
   TypeAlias
 } from './Module'
 
+// it is a static method, I wish eslint was smarter
+/* eslint-disable-next-line @typescript-eslint/unbound-method  */
+const isFunctionLikeDeclaration = ast.Node.isFunctionLikeDeclaration
+
 // -------------------------------------------------------------------------------------
 // model
 // -------------------------------------------------------------------------------------
@@ -46,7 +50,7 @@ import {
  * @category model
  * @since 0.6.0
  */
-export interface Parser<A> extends RE.ReaderEither<ParserEnv, string, A> {}
+export type Parser<A> = RE.ReaderEither<ParserEnv, string, A>
 
 /**
  * @category model
@@ -348,7 +352,7 @@ const parseFunctionDeclaration = (fd: ast.FunctionDeclaration): Parser<Function>
   )
 
 const parseFunctionVariableDeclaration = (vd: ast.VariableDeclaration): Parser<Function> => {
-  const vs: any = vd.getParent().getParent()
+  const vs = vd.getParent().getParent() as ast.VariableStatement
   const name = vd.getName()
   return pipe(
     getJSDocText(vs.getJsDocs()),
@@ -385,12 +389,12 @@ const getFunctionDeclarations: RE.ReaderEither<
     RA.filter(
       every([
         (vd) => isVariableDeclarationList(vd.getParent()),
-        (vd) => isVariableStatement(vd.getParent().getParent() as any),
+        (vd) => isVariableStatement(vd.getParent().getParent() as ast.VariableStatement),
         (vd) =>
           pipe(
             vd.getInitializer(),
             every([
-              flow(O.fromNullable, O.flatMap(O.fromPredicate(ast.Node.isFunctionLikeDeclaration)), O.isSome),
+              flow(O.fromNullable, O.flatMap(O.fromPredicate(isFunctionLikeDeclaration)), O.isSome),
               () =>
                 pipe(
                   (vd.getParent().getParent() as ast.VariableStatement).getJsDocs(),
@@ -467,7 +471,7 @@ export const parseTypeAliases: Parser<ReadonlyArray<TypeAlias>> = pipe(
 // -------------------------------------------------------------------------------------
 
 const parseConstantVariableDeclaration = (vd: ast.VariableDeclaration): Parser<Constant> => {
-  const vs: any = vd.getParent().getParent()
+  const vs = vd.getParent().getParent() as ast.VariableStatement
   const name = vd.getName()
   return pipe(
     getJSDocText(vs.getJsDocs()),
@@ -494,12 +498,12 @@ export const parseConstants: Parser<ReadonlyArray<Constant>> = pipe(
       RA.filter(
         every([
           (vd) => isVariableDeclarationList(vd.getParent()),
-          (vd) => isVariableStatement(vd.getParent().getParent() as any),
+          (vd) => isVariableStatement(vd.getParent().getParent() as ast.VariableStatement),
           (vd) =>
             pipe(
               vd.getInitializer(),
               every([
-                flow(O.fromNullable, O.flatMap(O.fromPredicate(not(ast.Node.isFunctionLikeDeclaration))), O.isSome),
+                flow(O.fromNullable, O.flatMap(O.fromPredicate(not(isFunctionLikeDeclaration))), O.isSome),
                 () =>
                   pipe(
                     (vd.getParent().getParent() as ast.VariableStatement).getJsDocs(),
@@ -823,7 +827,7 @@ export const parseFile =
       RTE.flatMap((env) =>
         pipe(
           RTE.right<EnvironmentWithConfig, string, RNEA.ReadonlyNonEmptyArray<string>>(
-            file.path.split(Path.sep) as any
+            file.path.split(Path.sep) as unknown as RNEA.ReadonlyNonEmptyArray<string>
           ),
           RTE.bindTo('path'),
           RTE.bind(
@@ -850,10 +854,10 @@ const createProject = (files: ReadonlyArray<File>): RTE.ReaderTaskEither<Environ
         }
       }
       const project = new ast.Project(options)
-      pipe(
-        files,
-        RA.map((file) => env.addFile(file)(project))
-      )
+      files.forEach((file) => {
+        env.addFile(file)(project)
+      })
+
       return RTE.of(project)
     })
   )
