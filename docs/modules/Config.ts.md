@@ -36,7 +36,7 @@ export interface Config {
   readonly enforceDescriptions: boolean
   readonly enforceExamples: boolean
   readonly enforceVersion: boolean
-  readonly exclude: readonly string[]
+  readonly exclude: ReadonlyArray<string>
   readonly parseCompilerOptions: Record<string, unknown>
   readonly examplesCompilerOptions: Record<string, unknown>
 }
